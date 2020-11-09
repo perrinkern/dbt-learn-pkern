@@ -1,5 +1,18 @@
 version: 2
 
+sources:
+  - name: prod_jaffle_shop_db
+    database: raw
+    schema: jaffle_shop
+    tables:
+      - name: customers
+      - name: orders
+  - name: prod_stripe_db
+    database: raw
+    schema: stripe
+    tables:
+      - name: payment
+
 models:
   - name: customers
     description: '{{ doc("customer_table") }}'
@@ -34,6 +47,20 @@ models:
           - accepted_values:
               values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
+  - name: stg_payment
+    description: This model cleans up order data
+    columns:
+      - name: payment_id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: payment_method
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['credit_card','coupon','bank_transfer','gift_card']
+
   - name: orders
     description: This model cleans up order data
     columns:
@@ -45,6 +72,6 @@ models:
       - name: customer_id
         tests:
           - not_null
-      - name: amount_in_USD
+      - name: amount_USD
         tests:
           - not_null
